@@ -89,6 +89,8 @@ func main() {
 
 	Logger.Infof("Starting Watchdog timer...")
 
+	errCount := 0
+
 	go func() {
 		for {
 			select {
@@ -97,8 +99,9 @@ func main() {
 				data, err := CopyWeb(Config.Watchtarget)
 
 				if err != nil {
+					errCount += 1
 					Logger.Errorf("Error while copying website: %v", err)
-					return
+					Logger.Debugf("Skipping this iteration with Error Count: %d", errCount)
 				}
 
 				if Config.Cache == nil {
