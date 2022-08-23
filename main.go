@@ -102,19 +102,20 @@ func main() {
 					errCount += 1
 					Logger.Errorf("Error while copying website: %v", err)
 					Logger.Debugf("Skipping this iteration with Error Count: %d", errCount)
+				}else {
+					if Config.Cache == nil {
+						Config.Cache = data
+					} else if !CompareBuf(Config.Cache, data) {
+						Logger.Infof("Website has changed!")
+						err = SendMail(client)
+						if err != nil {
+							Logger.Errorf("Error while sending mail: %v", err)
+						}
+						Logger.Infof("Email sent successfully")
+						Config.Cache = data
+					}
 				}
 
-				if Config.Cache == nil {
-					Config.Cache = data
-				} else if !CompareBuf(Config.Cache, data) {
-					Logger.Infof("Website has changed!")
-					err = SendMail(client)
-					if err != nil {
-						Logger.Errorf("Error while sending mail: %v", err)
-					}
-					Logger.Infof("Email sent successfully")
-					Config.Cache = data
-				}
 
 			case <-quit:
 				Logger.Infof("Bye Bye")
